@@ -6,5 +6,10 @@ pipeline {
                 sh 'python --version'
             }
         }
+        stage('print') {
+            steps {
+                sh 'print("Test of the python print")'
+            }
+        }
     }
 }
