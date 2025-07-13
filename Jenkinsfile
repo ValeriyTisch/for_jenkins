@@ -11,5 +11,10 @@ pipeline {
                 sh 'python3 pytest'
             }
         }
+        stage('notification') {
+            steps {
+                emailext attachLog: true, body: 'письмо от jenkins', subject: 'jenkins_message', to: 'polmnot@mail.ru'
+            }
+        }   
     }
 }
