@@ -8,7 +8,7 @@ pipeline {
         }
         stage('print') {
             steps {
-                sh 'print("Test of the python print")'
+                sh 'python print("Test of the python print")'
             }
         }
     }
