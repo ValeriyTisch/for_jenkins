@@ -1,4 +1,4 @@
-pipeline {
+hopipeline {
     agent { docker { image 'python:3.13.5-alpine3.22' } }
     stages {
         stage('build') {
@@ -8,7 +8,7 @@ pipeline {
         }
         stage('print') {
             steps {
-                sh 'python print('Test of the python print')'
+                echo 'ничего не получается'
             }
         }
     }
