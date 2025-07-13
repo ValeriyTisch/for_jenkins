@@ -3,12 +3,12 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'python --version'
+                sh 'python3 --version'
             }
         }
-        stage('print') {
+        stage('test') {
             steps {
-                echo 'ничего не получается'
+                sh 'python3 pytest::'
             }
         }
     }
