@@ -6,7 +6,7 @@ pipeline {
                 sh 'python3 --version'
                 sh 'pwd'
                 sh 'python3 -m venv venv'
-                sh 'source venv/bin/activate && pip install -r requirements.txt'
+                sh 'source venv/bin/activate && pip install --no-cache-dir -r requirements.txt'
             }
         }
         stage('test') {
