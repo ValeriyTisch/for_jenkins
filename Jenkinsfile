@@ -6,8 +6,7 @@ pipeline {
                 sh 'python3 --version'
                 sh 'pwd'
                 sh 'python3 -m venv venv'
-                sh 'source venv/bin/activate'
-                sh 'python3 pip install -r requirements.txt'
+                sh 'source venv/bin/activate && pip install -r requirements.txt'
             }
         }
         stage('test') {
