@@ -2,15 +2,14 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'python-pytest-image'
-        CONTAINER_NAME = 'pytest-runner'
+        IMAGE_NAME = 'jenkins-python-test'
         TEST_REPORT = 'test-results/pytest-report.xml'
     }
 
     stages {
         stage('Clone Repo') {
             steps {
-                 git branch: 'main',
+                git branch: 'main',
                     url: 'https://github.com/ValeriyTisch/for_jenkins.git'
             }
         }
@@ -23,13 +22,14 @@ pipeline {
             }
         }
 
-        stage('Run Tests in Docker') {
+        stage('Run Tests') {
             steps {
                 script {
-                    docker.image("${IMAGE_NAME}").inside('--name ' + CONTAINER_NAME) {
+                    docker.image("${IMAGE_NAME}").inside('--dns=8.8.8.8') {
                         sh 'pip install -r requirements.txt'
                         sh 'mkdir -p test-results'
-                        sh "pytest --junitxml=${TEST_REPORT} --maxfail=1 --disable-warnings -v"
+                        sh 'curl https://pypi.org/simple'  // Проверка подключения
+                        sh "pytest --junitxml=${TEST_REPORT} -v"
                     }
                 }
             }
@@ -37,23 +37,8 @@ pipeline {
 
         stage('Publish JUnit Report') {
             steps {
-                // Copy the report out of Docker container to workspace if needed
-                // But since `docker.image(...).inside()` shares the workspace, it will persist
                 junit allowEmptyResults: true, testResults: "${TEST_REPORT}"
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Cleaning up Docker container if exists'
-            sh "docker rm -f ${CONTAINER_NAME} || true"
-        }
-        success {
-            echo 'Tests passed!'
-        }
-        failure {
-            echo 'Tests failed!'
         }
     }
 }
