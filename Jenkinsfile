@@ -11,7 +11,7 @@ pipeline {
         stage('Clone Repo') {
             steps {
                  git branch: 'main',
-                    git 'https://github.com/ValeriyTisch/for_jenkins.git'
+                    url: 'https://github.com/ValeriyTisch/for_jenkins.git'
             }
         }
 
