@@ -10,7 +10,8 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/ValeriyTisch/for_jenkins.git'
+                 git branch: 'main',
+                    git 'https://github.com/ValeriyTisch/for_jenkins.git'
             }
         }
 
