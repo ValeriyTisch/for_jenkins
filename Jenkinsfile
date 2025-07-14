@@ -7,7 +7,7 @@ pipeline {
                 sh 'pwd'
                 sh 'python3 -m venv venv'
                 sh 'source venv/bin/activate'
-                sh 'sudo apt update && sudo apt install python3-pip'
+                sh 'apt install python3-pip'
                 sh 'pip3 install --default-timeout=1000 --no-cache-dir -r requirements.txt'
             }
         }
