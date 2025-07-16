@@ -29,16 +29,17 @@ pipeline {
             docker.image("${IMAGE_NAME}").withRun('--network=host --name ' + CONTAINER_NAME, 'sleep infinity') { c ->
                 sh """
                     docker exec ${CONTAINER_NAME} /bin/bash -c '
-                        python -m venv /tmp/venv &&
-                        /tmp/venv/bin/pip install --upgrade pip &&
-                        /tmp/venv/bin/pip install -r requirements.txt &&
-                        mkdir -p /tmp/test-results &&
-                        /tmp/venv/bin/pytest --junitxml=/tmp/test-results/pytest-report.xml -v || true
+                    python -m venv /tmp/venv &&
+                    /tmp/venv/bin/pip install --upgrade pip &&
+                    /tmp/venv/bin/pip install -r requirements.txt &&
+                    mkdir -p /tmp/test-results &&
+                    /tmp/venv/bin/pytest --junitxml=/tmp/test-results/pytest-report.xml -v || true
                     '
                 """
-                sh "mkdir -p test-results"
-                sh "docker cp ${CONTAINER_NAME}:/tmp/test-results/. ./test-results"
-                sh "chmod -R a+rw test-results"
+            // Очистить старые результаты
+            sh "rm -rf test-results && mkdir -p test-results"
+            // Копировать новые
+            sh "docker cp ${CONTAINER_NAME}:/tmp/test-results/. ./test-results"
             }
         }
     }
