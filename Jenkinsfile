@@ -27,15 +27,23 @@ pipeline {
         stage('Run Tests') {
     steps {
         script {
-            docker.image("${IMAGE_NAME}").inside('--network=host -u root') {
-                sh 'pip install --upgrade pip'
-                sh 'pip install --no-cache-dir -r requirements.txt'
-                sh 'mkdir -p test-results'
-                sh 'pytest --junitxml=${TEST_REPORT} -v || true'
+            docker.image("${IMAGE_NAME}").inside('--network=host') {
+                // создаем venv
+                sh 'python -m venv .venv'
+                
+                // активируем и используем venv
+                sh '''
+                    . .venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    mkdir -p test-results
+                    pytest --junitxml=${TEST_REPORT} -v || true
+                '''
             }
         }
     }
 }
+
 
         stage('Publish Test Results') {
             steps {
