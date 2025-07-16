@@ -24,25 +24,25 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-                script {
-                    // Явно запускаем контейнер с именем, чтобы потом забрать файл
-                    docker.image("${IMAGE_NAME}").withRun('--network=host --name ' + CONTAINER_NAME) { c ->
-                        sh """
-                            docker exec ${CONTAINER_NAME} /bin/bash -c '
-                                python -m venv /tmp/venv &&
-                                /tmp/venv/bin/pip install --upgrade pip &&
-                                /tmp/venv/bin/pip install -r requirements.txt &&
-                                mkdir -p /tmp/test-results &&
-                                /tmp/venv/bin/pytest --junitxml=/tmp/test-results/pytest-report.xml -v || true
-                            '
-                        """
-                        // Копируем тест-отчёт из контейнера в Jenkins
-                        sh "docker cp ${CONTAINER_NAME}:/tmp/test-results ./test-results"
-                    }
-                }
+    steps {
+        script {
+            docker.image("${IMAGE_NAME}").withRun('--network=host --name ' + CONTAINER_NAME, 'sleep infinity') { c ->
+                sh """
+                    docker exec ${CONTAINER_NAME} /bin/bash -c '
+                        python -m venv /tmp/venv &&
+                        /tmp/venv/bin/pip install --upgrade pip &&
+                        /tmp/venv/bin/pip install -r requirements.txt &&
+                        mkdir -p /tmp/test-results &&
+                        /tmp/venv/bin/pytest --junitxml=/tmp/test-results/pytest-report.xml -v || true
+                    '
+                """
+                // Копируем тест-отчёт из контейнера в Jenkins
+                sh "docker cp ${CONTAINER_NAME}:/tmp/test-results ./test-results"
             }
         }
+    }
+}
+
 
         stage('Publish Test Results') {
             steps {
