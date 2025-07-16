@@ -36,12 +36,14 @@ pipeline {
                         /tmp/venv/bin/pytest --junitxml=/tmp/test-results/pytest-report.xml -v || true
                     '
                 """
-                // Копируем тест-отчёт из контейнера в Jenkins
-                sh "docker cp ${CONTAINER_NAME}:/tmp/test-results ./test-results"
+                sh "mkdir -p test-results"
+                sh "docker cp ${CONTAINER_NAME}:/tmp/test-results/. ./test-results"
+                sh "chmod -R a+rw test-results"
             }
         }
     }
 }
+
 
 
         stage('Publish Test Results') {
