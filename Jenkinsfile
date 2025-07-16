@@ -83,6 +83,11 @@ pipeline {
         }
     }
 }
+stage('Publish HTML Report') {
+    steps {
+        archiveArtifacts artifacts: 'test-results/report.html', fingerprint: true
+    }
+}
 
 
         stage('Publish Test Results') {
