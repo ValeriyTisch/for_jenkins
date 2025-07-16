@@ -27,24 +27,20 @@ pipeline {
         stage('Run Tests') {
     steps {
         script {
-            docker.image("${IMAGE_NAME}").inside('--network=host -u 1000:1000') {
-                // создаем venv
-                sh 'python -m venv .venv'
-                
-                // активируем и используем venv
+            docker.image("${IMAGE_NAME}").inside('--network=host') {
                 sh '''
-                    python -m venv venv
-                    ./venv/bin/pip install --upgrade pip
-                    ./venv/bin/pip install -r requirements.txt
-                    mkdir -p test-results
-                    ./venv/bin/pytest --junitxml=test-results/pytest-report.xml -v || true
-                    chmod -R a+rw test-results
+                    mkdir -p /tmp/test-results
+                    python -m venv /tmp/venv
+                    /tmp/venv/bin/pip install --upgrade pip
+                    /tmp/venv/bin/pip install -r requirements.txt
+                    /tmp/venv/bin/pytest --junitxml=/tmp/test-results/pytest-report.xml -v || true
+                    cp -r /tmp/test-results ./  # скопировать в рабочую директорию Jenkins
                 '''
-
             }
         }
     }
 }
+
 
 
         stage('Publish Test Results') {
