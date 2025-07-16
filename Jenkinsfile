@@ -37,7 +37,6 @@ pipeline {
                                 /tmp/venv/bin/pip install -r requirements.txt &&
                                 mkdir -p /tmp/test-results &&
                                 /tmp/venv/bin/pytest --junitxml=/tmp/test-results/pytest-report.xml -v || true
-                                /tmp/venv/bin/pytest --junitxml=... --html=report.html --self-contained-html
                             '
                         """
 
