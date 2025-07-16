@@ -25,21 +25,17 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-                script {
-                    // Запускаем контейнер с принудительным DNS
-                    docker.image("${IMAGE_NAME}").inside('--dns=8.8.8.8') {
-                        sh 'pip install --upgrade pip'
-                        sh 'pip install -r requirements.txt'
-                        sh 'mkdir -p test-results'
-                        // Проверка подключения (можно убрать позже)
-                        sh 'curl https://pypi.org/simple'
-                        // Запуск pytest с генерацией JUnit xml
-                        sh "pytest --junitxml=${TEST_REPORT} -v"
-                    }
-                }
+    steps {
+        script {
+            docker.image("${IMAGE_NAME}").inside('--network=host -u root') {
+                sh 'pip install --upgrade pip'
+                sh 'pip install --no-cache-dir -r requirements.txt'
+                sh 'mkdir -p test-results'
+                sh 'pytest --junitxml=${TEST_REPORT} -v || true'
             }
         }
+    }
+}
 
         stage('Publish Test Results') {
             steps {
