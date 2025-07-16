@@ -33,12 +33,14 @@ pipeline {
                 
                 // активируем и используем venv
                 sh '''
-                    . .venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
+                    python -m venv venv
+                    ./venv/bin/pip install --upgrade pip
+                    ./venv/bin/pip install -r requirements.txt
                     mkdir -p test-results
-                    pytest --junitxml=${TEST_REPORT} -v || true
+                    ./venv/bin/pytest --junitxml=test-results/pytest-report.xml -v || true
+                    chmod -R a+rw test-results
                 '''
+
             }
         }
     }
