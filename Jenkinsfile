@@ -37,6 +37,7 @@ pipeline {
                                 /tmp/venv/bin/pip install -r requirements.txt &&
                                 mkdir -p /tmp/test-results &&
                                 /tmp/venv/bin/pytest --junitxml=/tmp/test-results/pytest-report.xml -v || true
+                                /tmp/venv/bin/pytest --junitxml=... --html=report.html --self-contained-html
                             '
                         """
 
@@ -52,6 +53,38 @@ pipeline {
                 }
             }
         }
+        stage('Run Tests 2') {
+    steps {
+        script {
+            docker.image("${IMAGE_NAME}").withRun('--network=host --name ' + CONTAINER_NAME, 'sleep infinity') { c ->
+
+                // Установка зависимостей + запуск тестов с JUnit и HTML отчётами
+                sh """
+                    docker exec ${CONTAINER_NAME} /bin/bash -c '
+                        python -m venv /tmp/venv &&
+                        /tmp/venv/bin/pip install --upgrade pip &&
+                        /tmp/venv/bin/pip install -r requirements.txt &&
+                        /tmp/venv/bin/pip install pytest-html &&
+                        mkdir -p /tmp/test-results &&
+                        /tmp/venv/bin/pytest \
+                            --junitxml=/tmp/test-results/pytest-report.xml \
+                            --html=/tmp/test-results/report.html \
+                            --self-contained-html \
+                            -v || true
+                    '
+                """
+
+                // Удалить старые результаты (обход прав)
+                sh "docker run --rm -v \$PWD:/workspace alpine sh -c 'rm -rf /workspace/test-results'"
+                
+                // Копируем результаты из контейнера
+                sh "mkdir -p test-results"
+                sh "docker cp ${CONTAINER_NAME}:/tmp/test-results/. ./test-results"
+            }
+        }
+    }
+}
+
 
         stage('Publish Test Results') {
             steps {
