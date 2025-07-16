@@ -27,7 +27,7 @@ pipeline {
         stage('Run Tests') {
     steps {
         script {
-            docker.image("${IMAGE_NAME}").inside('--network=host') {
+            docker.image("${IMAGE_NAME}").inside('--network=host -u 1000:1000') {
                 // создаем venv
                 sh 'python -m venv .venv'
                 
