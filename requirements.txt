@@ -1,2 +1,4 @@
-pytest==8.4.1
-junitxml == 0.7
+junitxml
+pytest
+pytest-html
+allure-pytest
